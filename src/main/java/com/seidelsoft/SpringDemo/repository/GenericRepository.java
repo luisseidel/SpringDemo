@@ -1,6 +1,6 @@
 package com.seidelsoft.SpringDemo.repository;
 
-import com.seidelsoft.SpringDemo.model.GenericEntity;
+import com.seidelsoft.SpringDemo.model.entity.GenericEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
