@@ -1,20 +1,26 @@
 package com.seidelsoft.SpringDemo.model.entity;
 
+import com.seidelsoft.SpringDemo.model.enumerations.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Data
 @Entity
-@Table(name="users")
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable, GenericEntity<User> {
+@Table(name="users")
+public class User implements Serializable, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,45 +35,37 @@ public class User implements Serializable, GenericEntity<User> {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
-    )
-    private List<Role> roles = new ArrayList<>();
+    @Column(name = "role")
+    @Enumerated(EnumType.ORDINAL)
+    private Role role;
 
-    public User(String email, String password, String name, List<Role> roles) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.roles = roles;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.getDescription()));
     }
 
     @Override
-    public void update(User source) {
-        this.email = source.getEmail();
-        this.password = source.getPassword();
-        this.name = source.getName();
-        this.roles = source.getRoles();
+    public String getUsername() {
+        return email;
     }
 
     @Override
-    public User createNewInstance() {
-        User newInstance = new User();
-        newInstance.update(this);
-
-        return newInstance;
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", name='" + name + '\'' +
-                ", roles=" + roles +
-                '}';
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

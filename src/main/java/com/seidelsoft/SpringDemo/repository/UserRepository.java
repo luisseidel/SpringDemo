@@ -1,12 +1,12 @@
 package com.seidelsoft.SpringDemo.repository;
 
 import com.seidelsoft.SpringDemo.model.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends GenericRepository<User>{
+import java.util.Optional;
 
-    //@Query("SELECT u FROM User u WHERE u.email = :email")
-    //User findUserByEmail(@Param("email") String email);
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
 }
